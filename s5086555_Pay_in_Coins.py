@@ -4,9 +4,5 @@ def get_prime(number: int) -> list():
     primes = [x for x in range(1,number+1) if x not in non_primes]
     return primes
 
-# recursively searches for a list of numbers    
-def get_coins(total: int, min: int, max: int) -> list():
-    pass
-
 if __name__ == "__main__":
-    print(get_prime(10))
+    pass
