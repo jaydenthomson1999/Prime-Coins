@@ -1,9 +1,3 @@
-<<<<<<< HEAD
-
-
-if __name__ == "__main__":
-    pass
-=======
 # returns a list of prime numbers lesser or equal to input number 
 def get_prime(number: int) -> list():
     non_primes = set(j for i in range(2, 8) for j in range(i*2, number, i))
@@ -34,4 +28,3 @@ if __name__ == "__main__":
     maxi = -1
     mini = -1
 
->>>>>>> ead58c186b1e64ef41198fbb4e0697ede7791f84
