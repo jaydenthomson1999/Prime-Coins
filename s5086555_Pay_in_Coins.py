@@ -27,7 +27,7 @@ class Node:
             return False
 
     # generates children based on the remaining coins the node can use
-    def generate_children(self, coins) -> list:
+    def generate_children(self) -> list:
         children = []
         for coin in self.remaining_coins:
             new_coins_used = list(self.coins_used)
