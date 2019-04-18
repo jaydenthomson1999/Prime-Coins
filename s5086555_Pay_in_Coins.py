@@ -18,7 +18,7 @@ class Node:
             return False
 
     # is invalid if node has coin list greater than maximum
-    def is_invalid(self, maxi: int) -> bool:
+    def is_invalid(self, mini: int, maxi: int) -> bool:
         if maxi != None and len(self.coins_used) > maxi:
             return True
         else:
@@ -114,7 +114,7 @@ if __name__ == "__main__":
         node = stack.pop()
 
         # node has coin list which has gone over maximum
-        if node.is_invalid(maxi):
+        if node.is_invalid(mini,maxi):
             continue
         
         # node has coin list greater than minimum and sum equals grand total
