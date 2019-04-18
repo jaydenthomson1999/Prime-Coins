@@ -16,14 +16,15 @@ class Node:
             return True
         else:
             return False
-    
+
     # is invalid if node has coin list greater than maximum
     def is_invalid(self, maxi: int) -> bool:
         if maxi != None and len(self.coins_used) > maxi:
             return True
         else:
             return False
-    
+
+    # generates children based on the remaining coins the node can use
     def generate_children(self) -> list:
         children = []
         for coin in self.remaining_coins:
@@ -64,10 +65,12 @@ def initial_coins(total: int, coins: list) -> list:
 
     for coin in coins:
         new_total = total - coin
-
+        
+        # when total = 0 we have found a solution so we don't need new coins
         if new_total == 0:
             new_coins = []
         else:
+            # prunes coins that are greater than the coin added or the new total
             new_coins = list(coins)
             while new_coins[-1] > coin or new_coins[-1] > new_total:
                 new_coins.pop()
@@ -78,21 +81,23 @@ def initial_coins(total: int, coins: list) -> list:
     
 if __name__ == "__main__":
     # get input from console
+    # only has the total, no min or max restrictions
     if len(argv) == 2:
         total = int(argv[1])
         mini = None
         maxi = None
-
+    # only has minimum restriction, logically max = min
     elif len(argv) == 3:
         total = int(argv[1])
         mini = int(argv[2])
         maxi = mini
-        
+    # all three inputs total, min and max    
     elif len(argv) == 4:
         total = int(argv[1])
         mini = int(argv[2])
         maxi = int(argv[3])
 
+    # main algorithm starts now, timer starts now
     start = time()
 
     # init main lists
@@ -103,7 +108,9 @@ if __name__ == "__main__":
     init_states = initial_coins(total, coins)
     stack = deque(init_states)
     
+    # depth first search until stack is empty
     while len(stack) != 0:
+        # element from top of stack
         node = stack.pop()
 
         # node has coin list which has gone over maximum
