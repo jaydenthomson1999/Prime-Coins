@@ -2,26 +2,29 @@ from collections import deque
 from time import time
 from sys import argv
 
-# class node stores a node in the search tree
+''' class stores nodes in the search tree and can determine if its invalid or a 
+    goal and can geneate the nodes children in the search tree  '''
 class Node:
-    def __init__(self, coins_used, total, remaining_coins):
+    def __init__(self, coins_used:list, total:int, remaining_coins: list):
         self.coins_used = coins_used
         self.total = total
         self.remaining_coins = remaining_coins
     
-    def is_goal(self, mini):
+    # is a goal if node has total equal to 0 and its coin list is >= mini
+    def is_goal(self, mini: int) -> bool:
         if self.total == 0 and (mini == None or len(self.coins_used) >= mini):
             return True
         else:
             return False
     
-    def is_invalid(self, maxi):
+    # is invalid if node has coin list greater than maximum
+    def is_invalid(self, maxi: int) -> bool:
         if maxi != None and len(self.coins_used) > maxi:
             return True
         else:
             return False
     
-    def generate_children(self):
+    def generate_children(self) -> list:
         children = []
         for coin in self.remaining_coins:
             new_coins_used = list(self.coins_used)
@@ -40,9 +43,11 @@ class Node:
             children.append(Node(new_coins_used, new_total, 
                             new_coins_remaining))
         return children
-    
 
-# returns a list of prime numbers lesser or equal to input number 
+''' returns a list of prime numbers lesser or equal to input number by 
+    generating a list of non prime numbers and iterates through 1 to number 
+    (inclusive) and checks if it is in the non prime numbers list, if not than 
+    it is a prime number, add to primes list '''
 def get_prime(number: int) -> list():
     non_primes = set(j for i in range(2, 8) for j in range(i*2, number, i))
 
@@ -53,7 +58,8 @@ def get_prime(number: int) -> list():
 
     return primes
 
-def initial_coins(total, coins):
+''' returns the initial list of coins that initialises the stack'''
+def initial_coins(total: int, coins: list) -> list:
     init_list = []
 
     for coin in coins:
@@ -89,23 +95,26 @@ if __name__ == "__main__":
 
     start = time()
 
+    # init main lists
     coins = get_prime(total)
-    stack = deque()
     goals = []
 
     # initialised stack with prime coins
     init_states = initial_coins(total, coins)
-    stack.extend(init_states)
+    stack = deque(init_states)
     
     while len(stack) != 0:
         node = stack.pop()
 
+        # node has coin list which has gone over maximum
         if node.is_invalid(maxi):
             continue
-
+        
+        # node has coin list greater than minimum and sum equals grand total
         elif node.is_goal(mini):
             goals.append(node)
 
+        # explore children branches and add them to stack
         else:
             children = node.generate_children()
             stack.extend(children)
