@@ -1,41 +1,75 @@
+from collections import deque
+from time import time
+
 # returns a list of prime numbers lesser or equal to input number 
 def get_prime(number: int) -> list():
     non_primes = set(j for i in range(2, 8) for j in range(i*2, number, i))
-    primes = [x for x in range(1,number+1) if x not in non_primes]
+    primes = []
+    for i in range(1, number+1):
+        if i not in non_primes:
+            primes.append(i)
+
     return primes
 
-def get_coins(total, coins):
-    if total == 1:
-        return [[1]]
+class Node:
+    def __init__(self, coins_used, total, remaining_coins):
+        self.coins_used = coins_used
+        self.total = total
+        self.remaining_coins = remaining_coins
+    
+    def isGoal(self):
+        if self.total == 0:
+            return True
+        else:
+            return False
 
-    coin_superset = []
+if __name__ == "__main__":
+    start = time()
+    total = 5
+    coins = get_prime(total)
+    stack = deque()
+    goals = []
 
     for coin in coins:
-        coin_subset = []
         new_total = total - coin
-        
+
         if new_total == 0:
-            coin_subset.extend([coin])
+            new_coins = []
         else:
             new_coins = list(coins)
 
-            while(new_coins[-1] > new_total):
+            while new_coins[-1] > coin or new_coins[-1] > new_total:
                 new_coins.pop()
+        
+        stack.append(Node([coin], new_total, new_coins))
+    
+    while len(stack) != 0:
+        node = stack.pop()
 
-            temp_set = get_coins(new_total, new_coins)
+        if node.isGoal():
+            goals.append(node)
 
-            for temp in temp_set:
-                temp.extend([coin])
+        else:
+            for coin in node.remaining_coins:
+                new_coins_used = list(node.coins_used)
+                new_coins_used.append(coin)
 
-            coin_subset.extend(temp)
+                new_total = node.total - coin
 
-        coin_superset.append(coin_subset)
-    return coin_superset
+                if new_total == 0:
+                    new_coins = []
+                else:
+                    new_coins = list(node.remaining_coins)
 
-if __name__ == "__main__":
-    total = 10
-    coins = get_prime(total)
-    maxi = -1
-    mini = -1
-
-    print(get_coins(total, coins))
+                    while new_coins[-1] > coin or new_coins[-1] > new_total:
+                        new_coins.pop()
+                
+                stack.append(Node(new_coins_used, new_total, new_coins))
+    end = time()
+    print("time: {}".format(end-start))
+    print("solutions: {}".format(len(goals)))
+    while len(goals) != 0:
+        node = goals.pop()
+        print(node.coins_used)
+                
+                
