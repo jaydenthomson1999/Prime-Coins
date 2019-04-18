@@ -1,5 +1,5 @@
 from collections import deque
-from time import time
+import time
 from sys import argv
 
 ''' class stores nodes in the search tree and can determine if its invalid or a 
@@ -21,11 +21,13 @@ class Node:
     def is_invalid(self, mini: int, maxi: int) -> bool:
         if maxi != None and len(self.coins_used) > maxi:
             return True
+        if self.total == 0 and (mini != None and len(self.coins_used) < mini):
+            return True
         else:
             return False
 
     # generates children based on the remaining coins the node can use
-    def generate_children(self) -> list:
+    def generate_children(self, coins) -> list:
         children = []
         for coin in self.remaining_coins:
             new_coins_used = list(self.coins_used)
@@ -107,6 +109,7 @@ def pay_in_coins(total: int, mini: int, maxi: int) -> int:
         else:
             children = node.generate_children()
             stack.extend(children)
+            
 
     return len(goals)
 
@@ -138,5 +141,5 @@ if __name__ == "__main__":
             maxi = int(args[2])
         
         sols = pay_in_coins(total, mini, maxi)
-        print(sols)
-              
+        timer = time.process_time()
+        print("{} : {} seconds".format(sols,timer))

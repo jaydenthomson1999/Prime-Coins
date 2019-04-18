@@ -1,6 +1,6 @@
 import time
 
-file = open("dictionary.txt")
+file = open("Input.txt")
 words = file.read().splitlines()
 file.close()
 
