@@ -78,28 +78,10 @@ def initial_coins(total: int, coins: list) -> list:
         init_list.append(Node([coin], new_total, new_coins))
     
     return init_list
-    
-if __name__ == "__main__":
-    # get input from console
-    # only has the total, no min or max restrictions
-    if len(argv) == 2:
-        total = int(argv[1])
-        mini = None
-        maxi = None
-    # only has minimum restriction, logically max = min
-    elif len(argv) == 3:
-        total = int(argv[1])
-        mini = int(argv[2])
-        maxi = mini
-    # all three inputs total, min and max    
-    elif len(argv) == 4:
-        total = int(argv[1])
-        mini = int(argv[2])
-        maxi = int(argv[3])
 
-    # main algorithm starts now, timer starts now
-    start = time()
-
+''' returns the amount of permutations that an amount of money can be payed for 
+    only using prime numbers '''
+def pay_in_coins(total: int, mini: int, maxi: int) -> int:
     # init main lists
     coins = get_prime(total)
     goals = []
@@ -126,7 +108,35 @@ if __name__ == "__main__":
             children = node.generate_children()
             stack.extend(children)
 
-    # pritning time, num of solutions and solutions            
-    end = time()
-    print("time: {}".format(end-start))
-    print("solutions: {}".format(len(goals)))           
+    return len(goals)
+
+if __name__ == "__main__":
+    path = argv[1]
+    file = open(path)
+    inputs = file.read().splitlines()
+    file.close()
+
+    # run algorithm for each line in the text file - path
+    for line in inputs:
+        # get args from line
+        args = line.split()
+
+        # only has the total, no min or max restrictions
+        if len(args) == 1:
+            total = int(args[0])
+            mini = None
+            maxi = None
+        # only has minimum restriction, logically max = min
+        elif len(args) == 2:
+            total = int(args[0])
+            mini = int(args[1])
+            maxi = mini
+        # all three inputs total, min and max    
+        elif len(args) == 3:
+            total = int(args[0])
+            mini = int(args[1])
+            maxi = int(args[2])
+        
+        sols = pay_in_coins(total, mini, maxi)
+        print(sols)
+              
