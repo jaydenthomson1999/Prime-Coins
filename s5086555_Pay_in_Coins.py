@@ -5,10 +5,9 @@ from sys import argv
 ''' class stores nodes in the search tree and can determine if its invalid or a 
     goal and can geneate the nodes children in the search tree  '''
 class Node:
-    def __init__(self, coins_used:list, total:int, remaining_coins: list):
+    def __init__(self, coins_used:list, total:int):
         self.coins_used = coins_used
         self.total = total
-        self.remaining_coins = remaining_coins
     
     # is a goal if node has total equal to 0 and its coin list is >= mini
     def is_goal(self, mini: int) -> bool:
@@ -29,22 +28,29 @@ class Node:
     # generates children based on the remaining coins the node can use
     def generate_children(self, coins) -> list:
         children = []
-        for coin in self.remaining_coins:
-            new_coins_used = list(self.coins_used)
-            new_coins_used.append(coin)
-            new_total = self.total - coin
+        # for coin in self.remaining_coins:
+        #     new_coins_used = list(self.coins_used)
+        #     new_coins_used.append(coin)
+        #     new_total = self.total - coin
 
-            if new_total == 0:
-                new_coins_remaining = []
-            else:
-                new_coins_remaining = list(self.remaining_coins)
+        #     if new_total == 0:
+        #         new_coins_remaining = []
+        #     else:
+        #         new_coins_remaining = list(self.remaining_coins)
                 
-                while ((new_coins_remaining[-1] > coin) or 
-                        (new_coins_remaining[-1] > new_total)):
-                    new_coins_remaining.pop()
+        #         while ((new_coins_remaining[-1] > coin) or 
+        #                 (new_coins_remaining[-1] > new_total)):
+        #             new_coins_remaining.pop()
 
-            children.append(Node(new_coins_used, new_total, 
-                            new_coins_remaining))
+        #     children.append(Node(new_coins_used, new_total, 
+        #                     new_coins_remaining))
+        for coin in coins:
+            if coin <= self.total and coin <= self.coins_used[-1]:
+                new_coins_used = list(self.coins_used)
+                new_coins_used.append(coin)
+                new_total = self.total - coin
+                children.append(Node(new_coins_used, new_total))
+
         return children
 
 ''' returns a list of prime numbers lesser or equal to input number by 
@@ -66,18 +72,8 @@ def initial_coins(total: int, coins: list) -> list:
     init_list = []
 
     for coin in coins:
-        new_total = total - coin
-        
-        # when total = 0 we have found a solution so we don't need new coins
-        if new_total == 0:
-            new_coins = []
-        else:
-            # prunes coins that are greater than the coin added or the new total
-            new_coins = list(coins)
-            while new_coins[-1] > coin or new_coins[-1] > new_total:
-                new_coins.pop()
-        
-        init_list.append(Node([coin], new_total, new_coins))
+        new_total = total - coin        
+        init_list.append(Node([coin], new_total))
     
     return init_list
 
@@ -99,7 +95,7 @@ def pay_in_coins(total: int, mini: int, maxi: int) -> int:
 
         # node has coin list which has gone over maximum
         if node.is_invalid(mini,maxi):
-            continue
+            del node
         
         # node has coin list greater than minimum and sum equals grand total
         elif node.is_goal(mini):
@@ -107,10 +103,9 @@ def pay_in_coins(total: int, mini: int, maxi: int) -> int:
 
         # explore children branches and add them to stack
         else:
-            children = node.generate_children()
+            children = node.generate_children(coins)
             stack.extend(children)
             
-
     return len(goals)
 
 if __name__ == "__main__":
