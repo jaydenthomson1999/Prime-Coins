@@ -99,7 +99,7 @@ def pay_in_coins(total: int, mini: int, maxi: int) -> int:
 
         # node has coin list which has gone over maximum
         if node.is_invalid(mini,maxi):
-            continue
+            del node
         
         # node has coin list greater than minimum and sum equals grand total
         elif node.is_goal(mini):
