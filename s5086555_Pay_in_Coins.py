@@ -1,18 +1,18 @@
 import time
+import gc
 from collections import deque
 from sys import argv
 
 ''' class stores nodes in the search tree and can determine if its invalid or a 
     goal and can geneate the nodes children in the search tree  '''
 class Node:
-    def __init__(self, coins_used:list, total:int, remaining_coins: list):
+    def __init__(self, coins_used:list, total:int):
         self.coins_used = coins_used
         self.total = total
-        self.remaining_coins = remaining_coins
     
     # is a goal if node has total equal to 0 and its coin list is >= mini
     def is_goal(self, mini: int) -> bool:
-        if self.total == 0 and (len(self.coins_used) >= mini):
+        if self.total == 0:
             return True
         else:
             return False
@@ -23,34 +23,21 @@ class Node:
             return True
         if self.total == 0 and (len(self.coins_used) < mini):
             return True
-        else:
-            return False
+        return False
 
     # generates children based on the remaining coins the node can use
-    def generate_children(self) -> list:
+    def generate_children(self, coins) -> list:
         children = []
-        for coin in self.remaining_coins:
-            new_coins_used = list(self.coins_used)
-            new_coins_used.append(coin)
-            new_total = self.total - coin
-
-            if new_total == 0:
-                new_coins_remaining = []
-            else:
-                new_coins_remaining = list(self.remaining_coins)
-                
-                while ((new_coins_remaining[-1] > coin) or 
-                        (new_coins_remaining[-1] > new_total)):
-                    new_coins_remaining.pop()
-
-            children.append(Node(new_coins_used, new_total, 
-                            new_coins_remaining))
+        for coin in coins:
+            if coin <= self.total and coin <= self.coins_used[-1]:
+                new_coins_used = list(self.coins_used)
+                new_coins_used.append(coin)
+                new_total = self.total - coin
+                child = Node(new_coins_used, new_total)
+                children.append(child)
         return children
 
-''' returns a list of prime numbers lesser or equal to input number by 
-    generating a list of non prime numbers and iterates through 1 to number 
-    (inclusive) and checks if it is in the non prime numbers list, if not than 
-    it is a prime number, add to primes list '''
+''' returns a list of prime numbers lesser or equal to input number '''
 def get_prime(number: int) -> list():
     non_primes = set(j for i in range(2, 8) for j in range(i*2, number, i))
 
@@ -77,7 +64,7 @@ def initial_coins(total: int, coins: list) -> list:
             while new_coins[-1] > coin or new_coins[-1] > new_total:
                 new_coins.pop()
         
-        init_list.append(Node([coin], new_total, new_coins))
+        init_list.append(Node([coin], new_total))
     
     return init_list
 
@@ -101,14 +88,13 @@ def pay_in_coins(total: int, mini: int, maxi: int) -> int:
         if node.is_invalid(mini,maxi):
             del node
             
-        
         # node has coin list greater than minimum and sum equals grand total
         elif node.is_goal(mini):
             goals.append(node)
 
         # explore children branches and add them to stack
         else:
-            children = node.generate_children()
+            children = node.generate_children(coins)
             stack.extend(children)            
 
     return len(goals)
@@ -145,6 +131,6 @@ if __name__ == "__main__":
         sols = pay_in_coins(total, mini, maxi)
         timer = time.process_time()
         print("{} : {} seconds".format(sols,timer))
-        file.write(str(sols))
+        file.write(str(sols) + '\n')
     
     file.close()
