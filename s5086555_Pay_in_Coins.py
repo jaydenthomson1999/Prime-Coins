@@ -1,5 +1,5 @@
-from collections import deque
 import time
+from collections import deque
 from sys import argv
 
 ''' class stores nodes in the search tree and can determine if its invalid or a 
@@ -12,16 +12,16 @@ class Node:
     
     # is a goal if node has total equal to 0 and its coin list is >= mini
     def is_goal(self, mini: int) -> bool:
-        if self.total == 0 and (mini == None or len(self.coins_used) >= mini):
+        if self.total == 0 and (len(self.coins_used) >= mini):
             return True
         else:
             return False
 
     # is invalid if node has coin list greater than maximum
     def is_invalid(self, mini: int, maxi: int) -> bool:
-        if maxi != None and len(self.coins_used) > maxi:
+        if len(self.coins_used) > maxi:
             return True
-        if self.total == 0 and (mini != None and len(self.coins_used) < mini):
+        if self.total == 0 and (len(self.coins_used) < mini):
             return True
         else:
             return False
@@ -100,6 +100,7 @@ def pay_in_coins(total: int, mini: int, maxi: int) -> int:
         # node has coin list which has gone over maximum
         if node.is_invalid(mini,maxi):
             del node
+            
         
         # node has coin list greater than minimum and sum equals grand total
         elif node.is_goal(mini):
@@ -108,16 +109,17 @@ def pay_in_coins(total: int, mini: int, maxi: int) -> int:
         # explore children branches and add them to stack
         else:
             children = node.generate_children()
-            stack.extend(children)
-            
+            stack.extend(children)            
 
     return len(goals)
 
 if __name__ == "__main__":
     path = argv[1]
-    file = open(path)
+    file = open(path, 'r')
     inputs = file.read().splitlines()
     file.close()
+
+    file = open("Output.txt", 'w')
 
     # run algorithm for each line in the text file - path
     for line in inputs:
@@ -127,8 +129,8 @@ if __name__ == "__main__":
         # only has the total, no min or max restrictions
         if len(args) == 1:
             total = int(args[0])
-            mini = None
-            maxi = None
+            mini = 1
+            maxi = total
         # only has minimum restriction, logically max = min
         elif len(args) == 2:
             total = int(args[0])
@@ -143,3 +145,6 @@ if __name__ == "__main__":
         sols = pay_in_coins(total, mini, maxi)
         timer = time.process_time()
         print("{} : {} seconds".format(sols,timer))
+        file.write(str(sols))
+    
+    file.close()
