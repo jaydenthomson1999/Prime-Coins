@@ -1,5 +1,5 @@
 import time
-import gc
+import weakref
 from collections import deque
 from sys import argv
 
@@ -21,12 +21,12 @@ class Node:
     def is_invalid(self, mini: int, maxi: int) -> bool:
         if len(self.coins_used) > maxi:
             return True
-        if self.total == 0 and (len(self.coins_used) < mini):
+        if (len(self.coins_used) < mini) and self.total == 0:
             return True
         return False
 
     # generates children based on the remaining coins the node can use
-    def generate_children(self, coins) -> list:
+    def generate_children(self, coins, mini, maxi) -> list:
         children = []
         for coin in coins:
             if coin <= self.total and coin <= self.coins_used[-1]:
@@ -34,7 +34,11 @@ class Node:
                 new_coins_used.append(coin)
                 new_total = self.total - coin
                 child = Node(new_coins_used, new_total)
-                children.append(child)
+
+                if not child.is_invalid(mini, maxi):
+                    children.append(child)
+                else:
+                    del child
         return children
 
 ''' returns a list of prime numbers lesser or equal to input number '''
@@ -49,34 +53,30 @@ def get_prime(number: int) -> list():
     return primes
 
 ''' returns the initial list of coins that initialises the stack'''
-def initial_coins(total: int, coins: list) -> list:
+def initial_coins(total: int, coins: list, mini, maxi) -> list:
     init_list = []
 
     for coin in coins:
         new_total = total - coin
-        
-        # when total = 0 we have found a solution so we don't need new coins
-        if new_total == 0:
-            new_coins = []
+        init_item = Node([coin], new_total)
+
+        if not init_item.is_invalid(mini, maxi):
+            init_list.append(init_item)
         else:
-            # prunes coins that are greater than the coin added or the new total
-            new_coins = list(coins)
-            while new_coins[-1] > coin or new_coins[-1] > new_total:
-                new_coins.pop()
-        
-        init_list.append(Node([coin], new_total))
+            del init_item
     
     return init_list
 
 ''' returns the amount of permutations that an amount of money can be payed for 
     only using prime numbers '''
 def pay_in_coins(total: int, mini: int, maxi: int) -> int:
+    goals = 0
+    
     # init main lists
     coins = get_prime(total)
-    goals = []
 
     # initialised stack with prime coins
-    init_states = initial_coins(total, coins)
+    init_states = initial_coins(total, coins, mini, maxi)
     stack = deque(init_states)
     
     # depth first search until stack is empty
@@ -84,20 +84,18 @@ def pay_in_coins(total: int, mini: int, maxi: int) -> int:
         # element from top of stack
         node = stack.pop()
 
-        # node has coin list which has gone over maximum
-        if node.is_invalid(mini,maxi):
-            del node
-            
         # node has coin list greater than minimum and sum equals grand total
-        elif node.is_goal(mini):
-            goals.append(node)
+        if node.is_goal(mini):
+            goals += 1
 
         # explore children branches and add them to stack
         else:
-            children = node.generate_children(coins)
-            stack.extend(children)            
+            children = node.generate_children(coins, mini, maxi)
+            stack.extend(children)  
 
-    return len(goals)
+        del node          
+
+    return goals
 
 if __name__ == "__main__":
     path = argv[1]
