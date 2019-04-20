@@ -11,7 +11,7 @@ class Node:
         self.total = total
     
     # is a goal if node has total equal to 0 and its coin list is >= mini
-    def is_goal(self, mini: int) -> bool:
+    def is_goal(self) -> bool:
         if self.total == 0:
             return True
         else:
@@ -21,12 +21,12 @@ class Node:
     def is_invalid(self, mini: int, maxi: int) -> bool:
         if len(self.coins_used) > maxi:
             return True
-        if (len(self.coins_used) < mini) and self.total == 0:
+        if self.total == 0 and (len(self.coins_used) < mini):
             return True
         return False
 
     # generates children based on the remaining coins the node can use
-    def generate_children(self, coins, mini, maxi) -> list:
+    def generate_children(self, coins: list, mini: int, maxi: int) -> list:
         children = []
         for coin in coins:
             if coin <= self.total and coin <= self.coins_used[-1]:
@@ -43,7 +43,7 @@ class Node:
 
 ''' returns a list of prime numbers lesser or equal to input number '''
 def get_prime(number: int) -> list():
-    non_primes = set(j for i in range(2, 8) for j in range(i*2, number, i))
+    non_primes = set(j for i in range(2, number) for j in range(i*2, number, i))
 
     primes = []
     for i in range(1, number+1):
@@ -53,7 +53,7 @@ def get_prime(number: int) -> list():
     return primes
 
 ''' returns the initial list of coins that initialises the stack'''
-def initial_coins(total: int, coins: list, mini, maxi) -> list:
+def initial_coins(total: int, coins: list, mini: int, maxi: int) -> list:
     init_list = []
 
     for coin in coins:
@@ -85,7 +85,7 @@ def pay_in_coins(total: int, mini: int, maxi: int) -> int:
         node = stack.pop()
 
         # node has coin list greater than minimum and sum equals grand total
-        if node.is_goal(mini):
+        if node.is_goal():
             goals += 1
 
         # explore children branches and add them to stack
