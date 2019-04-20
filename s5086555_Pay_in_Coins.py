@@ -10,14 +10,15 @@ class Node:
         self.coins_used = coins_used
         self.total = total
     
-    # is a goal if node has total equal to 0 and its coin list is >= mini
+    # is a goal if node has total equal to 0
     def is_goal(self) -> bool:
         if self.total == 0:
             return True
         else:
             return False
 
-    # is invalid if node has coin list greater than maximum
+    # is invalid if node has coin list greater than maximum or if total = 0 
+    # and has coin list lesser than minimum
     def is_invalid(self, mini: int, maxi: int) -> bool:
         if len(self.coins_used) > maxi:
             return True
@@ -25,7 +26,8 @@ class Node:
             return True
         return False
 
-    # generates children based on the remaining coins the node can use
+    # generates children based on the which coins it can use in the coin list
+    # and prunes out invalid children
     def generate_children(self, coins: list, mini: int, maxi: int) -> list:
         children = []
         for coin in coins:
