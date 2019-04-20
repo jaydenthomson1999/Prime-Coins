@@ -1,5 +1,4 @@
 import time
-import weakref
 from collections import deque
 from sys import argv
 
